@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017 Eric Kutcher
+	Copyright (C) 2017-2018 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -80,13 +80,13 @@ LRESULT CALLBACK MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam 
 			_InsertMenuItemW( g_hMenuSub_tray, 0, TRUE, &mii );
 
 			_memzero( &g_nid, sizeof( NOTIFYICONDATA ) );
-			g_nid.cbSize = sizeof( g_nid );
+			g_nid.cbSize = NOTIFYICONDATA_V2_SIZE;	// 5.0 (Windows 2000) and newer.
 			g_nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 			g_nid.hWnd = hWnd;
 			g_nid.uCallbackMessage = WM_TRAY_NOTIFY;
 			g_nid.uID = 1000;
 			g_nid.hIcon = ( HICON )_LoadImageW( GetModuleHandleW( NULL ), MAKEINTRESOURCE( IDI_ICON ), IMAGE_ICON, 16, 16, LR_SHARED );
-			_wmemcpy_s( g_nid.szTip, sizeof( g_nid.szTip ), L"Middle click the system tray icon or press Ctrl + Shift + F4 to turn the monitor off.\0", 86 );
+			_wmemcpy_s( g_nid.szTip, sizeof( g_nid.szTip ) / sizeof( g_nid.szTip[ 0 ] ), L"Middle click the system tray icon or press Ctrl + Shift + F4 to turn the monitor off.\0", 86 );
 			g_nid.szTip[ 85 ] = 0;	// Sanity.
 			_Shell_NotifyIconW( NIM_ADD, &g_nid );
 

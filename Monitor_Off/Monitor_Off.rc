@@ -62,8 +62,8 @@ IDI_ICON                ICON                    "icon.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -80,12 +80,12 @@ BEGIN
         BEGIN
             VALUE "Comments", "Monitor Off is made free under the GPLv3 license."
             VALUE "FileDescription", "Monitor Off will turn off the computer's monitor."
-            VALUE "FileVersion", "1, 0, 0, 0"
+            VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "Monitor Off"
             VALUE "LegalCopyright", "Copyright © 2017 Eric Kutcher"
             VALUE "OriginalFilename", "Monitor_Off.exe"
             VALUE "ProductName", "Monitor Off"
-            VALUE "ProductVersion", "1, 0, 0, 0"
+            VALUE "ProductVersion", "1, 0, 0, 1"
         END
     END
     BLOCK "VarFileInfo"
