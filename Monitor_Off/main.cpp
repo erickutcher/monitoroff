@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2018 Eric Kutcher
+	Copyright (C) 2017-2020 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -47,7 +47,8 @@ LRESULT CALLBACK LowLevelKeyboardProc( int nCode, WPARAM wParam, LPARAM lParam )
 	{
 		KBDLLHOOKSTRUCT *kbdllhs = ( KBDLLHOOKSTRUCT * )lParam;
 
-		if ( kbdllhs != NULL && wParam == WM_KEYDOWN )
+		// A key up might follow key down and prevent the monitor from turning off. Use key up instead.
+		if ( kbdllhs != NULL && wParam == WM_KEYUP )
 		{
 			if ( ( kbdllhs->vkCode == VK_F4 ) &&
 				 ( _GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) &&
@@ -63,8 +64,8 @@ LRESULT CALLBACK LowLevelKeyboardProc( int nCode, WPARAM wParam, LPARAM lParam )
 
 LRESULT CALLBACK MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-    switch ( msg )
-    {
+	switch ( msg )
+	{
 		case WM_CREATE:
 		{
 			g_hMenuSub_tray = _CreatePopupMenu();
@@ -194,17 +195,17 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	// Initialize our window class.
 	WNDCLASSEX wcex;
 	wcex.cbSize			= sizeof( WNDCLASSEX );
-	wcex.style          = CS_VREDRAW | CS_HREDRAW;
-	wcex.lpfnWndProc    = MainWndProc;
-	wcex.cbClsExtra     = 0;
-	wcex.cbWndExtra     = 0;
-	wcex.hInstance      = hInstance;
-	wcex.hIcon          = NULL;
-	wcex.hCursor        = NULL;
-	wcex.hbrBackground  = ( HBRUSH )( COLOR_WINDOW );
-	wcex.lpszMenuName   = NULL;
-	wcex.lpszClassName  = L"MonitorOff";
-	wcex.hIconSm        = NULL;
+	wcex.style			= CS_VREDRAW | CS_HREDRAW;
+	wcex.lpfnWndProc	= MainWndProc;
+	wcex.cbClsExtra		= 0;
+	wcex.cbWndExtra		= 0;
+	wcex.hInstance		= hInstance;
+	wcex.hIcon			= NULL;
+	wcex.hCursor		= NULL;
+	wcex.hbrBackground	= ( HBRUSH )( COLOR_WINDOW );
+	wcex.lpszMenuName	= NULL;
+	wcex.lpszClassName	= L"MonitorOff";
+	wcex.hIconSm		= NULL;
 
 	if ( !_RegisterClassExW( &wcex ) )
 	{
