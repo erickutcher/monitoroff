@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2020 Eric Kutcher
+	Copyright (C) 2017-2024 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -37,9 +37,35 @@
 
 HWND g_hWnd_main = NULL;
 
+UINT WM_TASKBARCREATED = 0;
+
+bool is_system_tray_initialized = false;
 HMENU g_hMenuSub_tray = NULL;
 
 NOTIFYICONDATA g_nid;
+
+BYTE vk_list[ 4 ];
+BYTE vk_list_count;
+
+void InitializeSystemTray( HWND hWnd )
+{
+	if ( !is_system_tray_initialized )
+	{
+		_memzero( &g_nid, sizeof( NOTIFYICONDATA ) );
+		g_nid.cbSize = NOTIFYICONDATA_V2_SIZE;	// 5.0 (Windows 2000) and newer.
+		g_nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
+		g_nid.hWnd = hWnd;
+		g_nid.uCallbackMessage = WM_TRAY_NOTIFY;
+		g_nid.uID = 1000;
+		g_nid.hIcon = ( HICON )_LoadImageW( GetModuleHandleW( NULL ), MAKEINTRESOURCE( IDI_ICON ), IMAGE_ICON, 16, 16, LR_SHARED );
+		_wmemcpy_s( g_nid.szTip, sizeof( g_nid.szTip ) / sizeof( g_nid.szTip[ 0 ] ), L"Middle click the system tray icon or press Ctrl + Shift + F4 to turn the monitor off.\0", 86 );
+		g_nid.szTip[ 85 ] = 0;	// Sanity.
+
+		is_system_tray_initialized = true;
+	}
+
+	_Shell_NotifyIconW( NIM_ADD, &g_nid );
+}
 
 LRESULT CALLBACK LowLevelKeyboardProc( int nCode, WPARAM wParam, LPARAM lParam )
 {
@@ -50,11 +76,35 @@ LRESULT CALLBACK LowLevelKeyboardProc( int nCode, WPARAM wParam, LPARAM lParam )
 		// A key up might follow key down and prevent the monitor from turning off. Use key up instead.
 		if ( kbdllhs != NULL && wParam == WM_KEYUP )
 		{
-			if ( ( kbdllhs->vkCode == VK_F4 ) &&
-				 ( _GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) &&
-				 ( _GetAsyncKeyState( VK_CONTROL ) & 0x8000 ) )
+			if ( vk_list_count > 0 )
 			{
-				_SendMessageW( g_hWnd_main, WM_SYSCOMMAND, SC_MONITORPOWER, 2 );
+				bool modifiers_are_down = false;
+				for ( BYTE i = 0; i < ( vk_list_count - 1 ); ++i )
+				{
+					if ( _GetAsyncKeyState( vk_list[ i ] ) & 0x8000 )
+					{
+						modifiers_are_down = true;
+					}
+					else
+					{
+						modifiers_are_down = false;
+						break;
+					}
+				}
+
+				if ( ( kbdllhs->vkCode == vk_list[ vk_list_count - 1 ] ) && modifiers_are_down )
+				{
+					_SendMessageW( g_hWnd_main, WM_SYSCOMMAND, SC_MONITORPOWER, 2 );
+				}
+			}
+			else
+			{
+				if ( ( kbdllhs->vkCode == VK_F4 ) &&
+					 ( _GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) &&
+					 ( _GetAsyncKeyState( VK_CONTROL ) & 0x8000 ) )
+				{
+					_SendMessageW( g_hWnd_main, WM_SYSCOMMAND, SC_MONITORPOWER, 2 );
+				}
 			}
 		}
 	}
@@ -80,16 +130,9 @@ LRESULT CALLBACK MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam 
 			mii.wID = MENU_EXIT;
 			_InsertMenuItemW( g_hMenuSub_tray, 0, TRUE, &mii );
 
-			_memzero( &g_nid, sizeof( NOTIFYICONDATA ) );
-			g_nid.cbSize = NOTIFYICONDATA_V2_SIZE;	// 5.0 (Windows 2000) and newer.
-			g_nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-			g_nid.hWnd = hWnd;
-			g_nid.uCallbackMessage = WM_TRAY_NOTIFY;
-			g_nid.uID = 1000;
-			g_nid.hIcon = ( HICON )_LoadImageW( GetModuleHandleW( NULL ), MAKEINTRESOURCE( IDI_ICON ), IMAGE_ICON, 16, 16, LR_SHARED );
-			_wmemcpy_s( g_nid.szTip, sizeof( g_nid.szTip ) / sizeof( g_nid.szTip[ 0 ] ), L"Middle click the system tray icon or press Ctrl + Shift + F4 to turn the monitor off.\0", 86 );
-			g_nid.szTip[ 85 ] = 0;	// Sanity.
-			_Shell_NotifyIconW( NIM_ADD, &g_nid );
+			InitializeSystemTray( hWnd );
+
+			WM_TASKBARCREATED = _RegisterWindowMessageW( L"TaskbarCreated" );
 
 			return 0;
 		}
@@ -159,6 +202,11 @@ LRESULT CALLBACK MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam 
 
 		default:
 		{
+			if ( msg == WM_TASKBARCREATED )
+			{
+				InitializeSystemTray( hWnd );
+			}
+
 			return _DefWindowProcW( hWnd, msg, wParam, lParam );
 		}
 		break;
@@ -189,6 +237,22 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	MSG msg;
 	_memzero( &msg, sizeof( MSG ) );
+
+	_memzero( vk_list, sizeof( BYTE ) * 4 );
+	vk_list_count = 0;
+
+	int argCount = 0;
+	LPWSTR *szArgList = _CommandLineToArgvW( GetCommandLineW(), &argCount );
+	if ( szArgList != NULL )
+	{
+		for ( int arg = 1; arg < argCount && arg <= 4; ++arg )
+		{
+			vk_list[ vk_list_count++ ] = ( BYTE )_wcstoul( szArgList[ arg ], NULL, 16 );
+		}
+
+		// Free the parameter list.
+		LocalFree( szArgList );
+	}
 
 	HHOOK hHook = _SetWindowsHookExW( WH_KEYBOARD_LL, LowLevelKeyboardProc, 0, 0 );
 

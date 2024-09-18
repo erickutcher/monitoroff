@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2020 Eric Kutcher
+	Copyright (C) 2017-2024 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #ifndef SHELL32_USE_STATIC_LIB
 
+	pCommandLineToArgvW		_CommandLineToArgvW;
 	pShell_NotifyIconW		_Shell_NotifyIconW;
 
 	HMODULE hModule_shell32 = NULL;
@@ -41,6 +42,7 @@
 			return false;
 		}
 
+		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_shell32, ( void ** )&_CommandLineToArgvW, "CommandLineToArgvW" ) )
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_shell32, ( void ** )&_Shell_NotifyIconW, "Shell_NotifyIconW" ) )
 
 		shell32_state = SHELL32_STATE_RUNNING;

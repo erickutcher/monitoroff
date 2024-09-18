@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2020 Eric Kutcher
+	Copyright (C) 2017-2024 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 	pLoadImageW				_LoadImageW;
 	pPostQuitMessage		_PostQuitMessage;
 	pRegisterClassExW		_RegisterClassExW;
+	pRegisterWindowMessageW	_RegisterWindowMessageW;
 	pSendMessageW			_SendMessageW;
 	pSetForegroundWindow	_SetForegroundWindow;
 	pSetWindowsHookExW		_SetWindowsHookExW;
@@ -72,6 +73,7 @@
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_user32, ( void ** )&_LoadImageW, "LoadImageW" ) )
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_user32, ( void ** )&_PostQuitMessage, "PostQuitMessage" ) )
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_user32, ( void ** )&_RegisterClassExW, "RegisterClassExW" ) )
+		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_user32, ( void ** )&_RegisterWindowMessageW, "RegisterWindowMessageW" ) )
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_user32, ( void ** )&_SendMessageW, "SendMessageW" ) )
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_user32, ( void ** )&_SetForegroundWindow, "SetForegroundWindow" ) )
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_user32, ( void ** )&_SetWindowsHookExW, "SetWindowsHookExW" ) )

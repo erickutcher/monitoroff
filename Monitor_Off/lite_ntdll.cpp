@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2020 Eric Kutcher
+	Copyright (C) 2017-2024 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@
 	pmemcpy			_memcpy;
 	pmemset			_memset;
 
+	pwcstoul		_wcstoul;
+
 	HMODULE hModule_ntdll = NULL;
 
 	unsigned char ntdll_state = NTDLL_STATE_SHUTDOWN;	// 0 = Not running, 1 = running.
@@ -53,6 +55,8 @@
 
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_ntdll, ( void ** )&_memcpy, "memcpy" ) )
 		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_ntdll, ( void ** )&_memset, "memset" ) )
+
+		VALIDATE_FUNCTION_POINTER( SetFunctionPointer( hModule_ntdll, ( void ** )&_wcstoul, "wcstoul" ) )
 
 		ntdll_state = NTDLL_STATE_RUNNING;
 

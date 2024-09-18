@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2020 Eric Kutcher
+	Copyright (C) 2017-2024 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@
 	#define _memcpy			memcpy
 	#define _memset			memset
 
+	#define _wcstoul		wcstoul
+
 	#define _memcpy_s		memcpy_s
 	#define _wmemcpy_s( dest, size, src, count )	memcpy_s( dest, sizeof( wchar_t ) * ( size ), src, sizeof( wchar_t ) * ( count ) )
 
@@ -45,8 +47,12 @@
 	typedef void * ( WINAPIV *pmemcpy )( void *dest, const void *src, size_t count );
 	typedef void * ( WINAPIV *pmemset )( void *dest, int c, size_t count );
 
+	typedef unsigned long ( WINAPIV *pwcstoul )( const wchar_t *nptr, wchar_t **endptr, int base );
+
 	extern pmemcpy			_memcpy;
 	extern pmemset			_memset;
+
+	extern pwcstoul			_wcstoul;
 
 	extern unsigned char ntdll_state;
 

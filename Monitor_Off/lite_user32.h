@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2020 Eric Kutcher
+	Copyright (C) 2017-2024 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@
 	#define _LoadImageW				LoadImageW
 	#define _PostQuitMessage		PostQuitMessage
 	#define _RegisterClassExW		RegisterClassExW
+	#define _RegisterWindowMessageW	RegisterWindowMessageW
 	#define _SendMessageW			SendMessageW
 	#define _SetForegroundWindow	SetForegroundWindow
 	#define _SetWindowsHookExW		SetWindowsHookExW
@@ -69,6 +70,7 @@
 	typedef HANDLE ( WINAPI *pLoadImageW )( HINSTANCE hinst, LPCTSTR lpszName, UINT uType, int cxDesired, int cyDesired, UINT fuLoad );
 	typedef VOID ( WINAPI *pPostQuitMessage )( int nExitCode );
 	typedef ATOM ( WINAPI *pRegisterClassExW )( const WNDCLASSEX *lpwcx );
+	typedef UINT ( WINAPI *pRegisterWindowMessageW )( LPCWSTR lpString );
 	typedef LRESULT ( WINAPI *pSendMessageW )( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
 	typedef BOOL ( WINAPI *pSetForegroundWindow )( HWND hWnd );
 	typedef HHOOK ( WINAPI *pSetWindowsHookExW )( int idHook, HOOKPROC lpfn, HINSTANCE hMod, DWORD dwThreadId );
@@ -89,6 +91,7 @@
 	extern pLoadImageW				_LoadImageW;
 	extern pPostQuitMessage			_PostQuitMessage;
 	extern pRegisterClassExW		_RegisterClassExW;
+	extern pRegisterWindowMessageW	_RegisterWindowMessageW;
 	extern pSendMessageW			_SendMessageW;
 	extern pSetForegroundWindow		_SetForegroundWindow;
 	extern pSetWindowsHookExW		_SetWindowsHookExW;

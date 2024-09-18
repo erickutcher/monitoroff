@@ -1,6 +1,6 @@
 /*
 	Monitor Off will turn off the computer's monitor.
-	Copyright (C) 2017-2020 Eric Kutcher
+	Copyright (C) 2017-2024 Eric Kutcher
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 
 	#include <shlwapi.h>
 
+	#define	_CommandLineToArgvW	CommandLineToArgvW
 	#define _Shell_NotifyIconW	Shell_NotifyIconW
 
 #else
@@ -42,8 +43,10 @@
 	#define SHELL32_STATE_SHUTDOWN		0
 	#define SHELL32_STATE_RUNNING		1
 
+	typedef LPWSTR * ( WINAPI *pCommandLineToArgvW )( LPCWSTR lpCmdLine, int *pNumArgs );
 	typedef BOOL ( WINAPI *pShell_NotifyIconW )( DWORD dwMessage, PNOTIFYICONDATA lpdata );
 
+	extern pCommandLineToArgvW	_CommandLineToArgvW;
 	extern pShell_NotifyIconW	_Shell_NotifyIconW;
 
 	extern unsigned char shell32_state;
